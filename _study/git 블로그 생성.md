@@ -1,0 +1,351 @@
+아래 내용 그대로 복붙해서 블로그 글로 쓰면 됩니다 😄
+(중간 코드/설정은 전부 이번에 실제로 진행한 흐름 기준으로 정리했어요.)
+
+---
+
+# GitHub Pages + Jekyll로 블로그 구축 기록 (Windows + 한글 계정 + 사이드바 구조)
+
+## 0. 목표 & 환경
+
+**목표**
+
+* GitHub Pages + Jekyll 기반 개인 블로그 구축
+* 로컬에서 미리보기 후 Git으로 관리
+* 좌측에 `업무 / 스터디` 같은 폴더형 네비게이션 구성
+* 메인 페이지는 깔끔하게 유지
+
+**환경**
+
+* OS: Windows
+* Shell: PowerShell
+* GitHub: `FelicityProjects` 계정
+* 블로그: `https://felicityprojects.github.io/`
+* 정적 사이트 엔진: Jekyll (기본 `minima` 테마)
+
+---
+
+## 1. GitHub Pages & Jekyll 개념 정리
+
+* GitHub Pages는 GitHub 저장소를 그대로 호스팅해 주는 정적 웹사이트 서비스.
+* **유저 페이지(User site)** 주소 형식:
+
+  * 저장소 이름이 반드시 **`<username>.github.io`**
+  * 예: `FelicityProjects` 계정 → `FelicityProjects.github.io` 저장소 → `https://felicityprojects.github.io` 로 접속
+* Jekyll은 Markdown/HTML + 설정 파일을 정적 사이트로 변환해주는 도구로, GitHub Pages에서 공식 지원.
+
+---
+
+## 2. 로컬 Jekyll 블로그 생성
+
+작업용 폴더 예시:
+
+```powershell
+cd /d D:\
+mkdir FelicityProjects.github.io
+cd FelicityProjects.github.io
+```
+
+Jekyll 사이트 생성:
+
+```powershell
+jekyll new .
+bundle install
+```
+
+이후 폴더 구조(핵심):
+
+```text
+_config.yml
+Gemfile
+index.markdown
+_posts/
+```
+
+이 상태에서 Jekyll 기본 블로그 골격이 준비된다.
+
+---
+
+## 3. Windows + 한글 계정 인코딩 문제 해결
+
+실제 진행 중 에러:
+
+```text
+incompatible character encodings: UTF-8 and CP949 (Encoding::CompatibilityError)
+C:/Users/라이프로그/.local/share/gem/...
+```
+
+원인:
+
+* Ruby/Gem 경로에 한글이 포함되어 있고
+* Bundler/Jekyll이 UTF-8을 기대하는데 CP949 경로와 섞이면서 충돌.
+
+### 해결 방법 (이번 작업 기준)
+
+1. **콘솔을 UTF-8로 전환**
+
+```powershell
+chcp 65001
+```
+
+2. **영문 전용 Gem 디렉터리 사용**
+
+```powershell
+mkdir C:\jekyll-gems
+
+$env:GEM_HOME="C:\jekyll-gems"
+$env:GEM_PATH="C:\jekyll-gems"
+$env:BUNDLE_USER_HOME="C:\jekyll-gems"
+$env:RUBYOPT="-EUTF-8:UTF-8"
+
+gem install bundler
+gem install jekyll
+bundle install
+```
+
+* Gem / Bundler / Jekyll이 더 이상 `C:/Users/한글계정/...` 경로를 안 쓰게 해서 인코딩 충돌 회피.
+* 필요하면 이 설정을 PowerShell 프로필(`$PROFILE`)에 넣어 새 창마다 자동 적용.
+
+---
+
+## 4. 로컬 서버 실행 및 확인
+
+프로젝트 루트에서:
+
+```powershell
+bundle exec jekyll serve
+```
+
+정상 출력 예:
+
+```text
+Server address: http://127.0.0.1:4000/
+Server running... press ctrl-c to stop.
+```
+
+브라우저에서 `http://127.0.0.1:4000/` 접속 → 기본 Jekyll 블로그 페이지 확인.
+
+---
+
+## 5. GitHub에 최초 배포
+
+### 5-1. Git 초기화 & 커밋
+
+```powershell
+cd /d D:\FelicityProjects.github.io
+
+git init
+git add .
+git commit -m "Init Jekyll blog"
+```
+
+### 5-2. GitHub 리포지토리 연결
+
+GitHub에서 **`FelicityProjects.github.io`** (Public) 저장소 생성 후:
+
+```powershell
+git remote add origin https://github.com/FelicityProjects/FelicityProjects.github.io.git
+git branch -M main
+git push -u origin main
+```
+
+---
+
+## 6. GitHub Pages 설정
+
+GitHub 리포지토리에서:
+
+1. **Settings → Pages** 이동
+2. **Source**:
+
+   * `Deploy from a branch`
+   * Branch: `main`
+   * Folder: `/ (root)`
+3. 저장 후 잠시 기다리면
+
+   * “Your site is live at `https://felicityprojects.github.io`” 문구 확인
+
+→ 실제 접속: `https://felicityprojects.github.io/` 정상 동작.
+
+---
+
+## 7. `_config.yml` 기본 세팅
+
+Jekyll 설정 파일에서 블로그 정보 정리:
+
+```yaml
+title: "Code & Coffee"
+description: "개발 · 업무 · 스터디 아카이브"
+url: "https://felicityprojects.github.io"
+baseurl: ""          # 유저 페이지이므로 빈 값
+theme: minima        # 기본 테마
+```
+
+이제 내부 링크/리소스 경로가 도메인 기준으로 안정적으로 동작한다.
+
+---
+
+## 8. 폴더처럼 보이는 구조: `_posts` vs Collections
+
+문서가 많아질 때, 모든 내용을 메인에 노출하면 지저분해지기 때문에 구조를 분리했다.
+
+### 핵심 원칙
+
+1. 메인 블로그 글:
+
+   * `_posts/` 폴더에만 둔다.
+   * 메인 페이지(`layout: home`)는 `site.posts`만 출력 → 불필요한 문서가 메인에 안 뜸.
+2. 업무/스터디 문서:
+
+   * `_work/`, `_study/` 같은 **Collections**로 관리.
+   * 좌측 사이드바에서 “폴더 트리”처럼 노출.
+
+### 8-1. `_config.yml` 컬렉션 설정
+
+```yaml
+collections:
+  work:
+    output: true
+    permalink: /work/:path/
+  study:
+    output: true
+    permalink: /study/:path/
+```
+
+### 8-2. 디렉터리 구조
+
+```text
+_posts/             # 일반 블로그 포스트 (메인 목록)
+_work/              # 업무 관련 문서
+_study/             # 스터디/학습 문서
+```
+
+예시:
+
+`_work/jenkins-guide.md`
+
+```markdown
+---
+title: "Jenkins 배포 자동화 정리"
+---
+
+업무 관련 Jenkins 설정 노트...
+```
+
+`_study/git-basic.md`
+
+```markdown
+---
+title: "Git 기초 정리"
+---
+
+스터디용 Git 정리...
+```
+
+컬렉션 문서는 `site.work`, `site.study`로 접근하며, 기본 포스트 목록에 자동 포함되지 않는다.
+
+---
+
+## 9. 좌측 사이드바: 폴더 트리처럼 보이게 만들기
+
+### 9-1. `_data/nav.yml`
+
+```yaml
+- title: "업무"
+  collection: "work"
+- title: "스터디"
+  collection: "study"
+```
+
+### 9-2. `_includes/sidebar.html`
+
+```html
+<nav class="sidebar-nav">
+  <h3>폴더</h3>
+  <ul>
+    {% for item in site.data.nav %}
+      <li>
+        <strong>{{ item.title }}</strong>
+        {% assign coll = site[item.collection] | sort: "title" %}
+        {% if coll and coll != empty %}
+          <ul>
+            {% for doc in coll %}
+              <li>
+                <a href="{{ doc.url | relative_url }}">{{ doc.title }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
+```
+
+### 9-3. `_layouts/default.html`에 사이드바 삽입
+
+```html
+<div class="page">
+  <aside class="sidebar">
+    {% include sidebar.html %}
+  </aside>
+  <main class="page-content">
+    {{ content }}
+  </main>
+</div>
+```
+
+### 9-4. 간단 스타일
+
+```scss
+.page {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sidebar {
+  width: 200px;
+  padding: 1.2rem 1rem;
+  border-right: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.page-content {
+  flex: 1;
+  padding: 1.5rem;
+}
+```
+
+이렇게 하면:
+
+* 좌측: `업무` / `스터디` 아래에 관련 문서 목록 자동 출력
+* 우측: 선택한 문서 내용
+* 메인 홈: `_posts`만 노출 → 구조적이면서 깔끔한 블로그 완성
+
+---
+
+## 10. 앞으로의 워크플로우
+
+1. 로컬에서 글/문서 작성
+
+   * 블로그 글 → `_posts`
+   * 업무 문서 → `_work`
+   * 스터디 문서 → `_study`
+2. 로컬 확인
+
+   ```bash
+   bundle exec jekyll serve
+   ```
+3. GitHub 반영
+
+   ```bash
+   git add .
+   git commit -m "콘텐츠/구조 업데이트"
+   git push
+   ```
+4. GitHub Pages가 자동 배포 → `https://felicityprojects.github.io`에서 확인
+
+---
+
+이 포스트는 “Windows + 한글 계정 + GitHub Pages + Jekyll + 사이드바 구조”라는 꽤 현실적인 조합에서 실제로 겪은 삽질과 해결 과정을 정리한 것입니다.
+이제부터는 환경 고민 없이 콘텐츠 쌓는 데만 집중하면 됩니다 ☕️🚀
