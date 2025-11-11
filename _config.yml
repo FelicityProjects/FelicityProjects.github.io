@@ -1,0 +1,15 @@
+title: "Code & Coffee"        # 블로그 제목
+description: "개발과 커피 기록"  # 짧은 설명
+author: "라이프로그"           # 닉네임
+email: "이메일@주소"
+url: "https://codeandcoffee.github.io"
+baseurl: ""                   # 사용자 페이지면 빈 값
+theme: minima                 # 기본 Jekyll 테마 (이미 있을 수 있음)
+collections:
+  work:
+    output: true
+    permalink: /work/:path/
+  study:
+    output: true
+    permalink: /study/:path/
+

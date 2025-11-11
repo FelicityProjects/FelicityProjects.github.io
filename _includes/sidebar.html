@@ -1,0 +1,22 @@
+<nav class="sidebar-nav">
+  <h3>폴더</h3>
+  <ul>
+    {% for item in site.data.nav %}
+      <li>
+        <strong>{{ item.title }}</strong>
+        {% assign coll = site[item.collection] | sort: "order" %}
+        {% if coll and coll != empty %}
+          <ul>
+            {% for doc in coll %}
+              <li>
+                <a href="{{ doc.url | relative_url }}">
+                  {{ doc.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

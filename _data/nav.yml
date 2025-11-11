@@ -1,0 +1,4 @@
+- title: "업무"
+  collection: "work"      # 나중에 _work 컬렉션과 연결
+- title: "스터디"
+  collection: "study"     # 나중에 _study 컬렉션과 연결
