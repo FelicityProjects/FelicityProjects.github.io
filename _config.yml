@@ -12,4 +12,3 @@ collections:
   study:
     output: true
     permalink: /study/:path/
-

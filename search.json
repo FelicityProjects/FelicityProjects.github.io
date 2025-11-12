@@ -1,0 +1,15 @@
+---
+layout: null
+permalink: /search.json
+---
+[
+  {% assign items = site.posts | concat: site.work | concat: site.study %}
+  {% for doc in items %}
+  {
+    "title": {{ doc.title | jsonify }},
+    "url":   {{ doc.url   | relative_url | jsonify }},
+    "date":  "{{ doc.date | date: "%Y-%m-%d" }}",
+    "content": {{ doc.content | strip_html | normalize_whitespace | jsonify }}
+  }{% if forloop.last == false %},{% endif %}
+  {% endfor %}
+]

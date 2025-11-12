@@ -1,0 +1,67 @@
+---
+layout: default
+---
+
+<section class="home-hero">
+  <div class="home-hero__inner">
+    <h1>Code & Coffee</h1>
+    <p class="tagline">개발·업무·스터디를 한 곳에.</p>
+    <div class="cta">
+      <a class="btn" href="{{ '/work/'  | relative_url }}">업무 보기</a>
+      <a class="btn ghost" href="{{ '/study/' | relative_url }}">스터디 보기</a>
+    </div>
+    <div class="stats">
+      <span>업무: {{ site.work  | size }} docs</span>
+      <span>스터디: {{ site.study | size }} docs</span>
+      <span>포스트: {{ site.posts | size }} posts</span>
+    </div>
+  </div>
+</section>
+
+<section class="folder-cards">
+  <a class="card" href="{{ '/work/'  | relative_url }}">
+    <h3>업무</h3>
+    <p>실무 정리, 배포/인프라, 도구 가이드</p>
+  </a>
+  <a class="card" href="{{ '/study/' | relative_url }}">
+    <h3>스터디</h3>
+    <p>개념 정리, 예제, 튜토리얼</p>
+  </a>
+</section>
+
+<section class="latest-posts">
+  <h2>최근 글</h2>
+  <div class="post-grid">
+    {% for post in site.posts limit:6 %}
+      <article class="post-card">
+        <a href="{{ post.url | relative_url }}">
+          <h3>{{ post.title }}</h3>
+          <time datetime="{{ post.date | date_to_xmlschema }}">
+            {{ post.date | date: "%Y-%m-%d" }}
+          </time>
+          {% if post.excerpt %}
+            <p>{{ post.excerpt | strip_html | truncate: 120 }}</p>
+          {% endif %}
+        </a>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="search-box">
+  <input id="search-input" type="search" placeholder="검색어를 입력하세요" />
+  <ul id="results-container"></ul>
+</section>
+
+<script src="https://unpkg.com/simple-jekyll-search/dest/simple-jekyll-search.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    SimpleJekyllSearch({
+      searchInput: document.getElementById('search-input'),
+      resultsContainer: document.getElementById('results-container'),
+      json: '{{ "/search.json" | relative_url }}',
+      limit: 10,
+      fuzzy: true
+    });
+  });
+</script>

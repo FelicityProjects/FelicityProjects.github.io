@@ -1,53 +1,19 @@
 <nav class="sidebar-nav">
-  <h3>폴더</h3>
-  <ul class="folder-root">
-    {% for item in site.data.nav %}
-      {% assign coll = site[item.collection] | sort: "order" %}
-      <li class="folder-item">
-        <button class="folder-toggle"
-                type="button"
-                data-target="folder-{{ item.collection }}">
-          ▶ {{ item.title }}
-        </button>
+  <details class="folder">
+    <summary>업무</summary>
+    <ul>
+      {% for doc in site.work %}
+        <li><a href="{{ doc.url | relative_url }}">{{ doc.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </details>
 
-        {% if coll and coll != empty %}
-          <ul id="folder-{{ item.collection }}"
-              class="folder-list is-collapsed">
-            {% for doc in coll %}
-              <li>
-                <a href="{{ doc.url | relative_url }}">
-                  {{ doc.title }}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
+  <details class="folder">
+    <summary>스터디</summary>
+    <ul>
+      {% for doc in site.study %}
+        <li><a href="{{ doc.url | relative_url }}">{{ doc.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </details>
 </nav>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var toggles = document.querySelectorAll('.folder-toggle');
-
-    toggles.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var targetId = btn.getAttribute('data-target');
-        var list = document.getElementById(targetId);
-        if (!list) return;
-
-        var isCollapsed = list.classList.contains('is-collapsed');
-
-        // 접기/펼치기
-        if (isCollapsed) {
-          list.classList.remove('is-collapsed');
-          btn.textContent = '▼ ' + btn.textContent.replace(/^. /, '');
-        } else {
-          list.classList.add('is-collapsed');
-          btn.textContent = '▶ ' + btn.textContent.replace(/^. /, '');
-        }
-      });
-    });
-  });
-</script>
