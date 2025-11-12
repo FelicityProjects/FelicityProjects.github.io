@@ -1,12 +1,18 @@
 <nav class="sidebar-nav">
   <h3>폴더</h3>
-  <ul>
+  <ul class="folder-root">
     {% for item in site.data.nav %}
-      <li>
-        <strong>{{ item.title }}</strong>
-        {% assign coll = site[item.collection] | sort: "order" %}
+      {% assign coll = site[item.collection] | sort: "order" %}
+      <li class="folder-item">
+        <button class="folder-toggle"
+                type="button"
+                data-target="folder-{{ item.collection }}">
+          ▶ {{ item.title }}
+        </button>
+
         {% if coll and coll != empty %}
-          <ul>
+          <ul id="folder-{{ item.collection }}"
+              class="folder-list is-collapsed">
             {% for doc in coll %}
               <li>
                 <a href="{{ doc.url | relative_url }}">
@@ -20,3 +26,28 @@
     {% endfor %}
   </ul>
 </nav>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var toggles = document.querySelectorAll('.folder-toggle');
+
+    toggles.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var targetId = btn.getAttribute('data-target');
+        var list = document.getElementById(targetId);
+        if (!list) return;
+
+        var isCollapsed = list.classList.contains('is-collapsed');
+
+        // 접기/펼치기
+        if (isCollapsed) {
+          list.classList.remove('is-collapsed');
+          btn.textContent = '▼ ' + btn.textContent.replace(/^. /, '');
+        } else {
+          list.classList.add('is-collapsed');
+          btn.textContent = '▶ ' + btn.textContent.replace(/^. /, '');
+        }
+      });
+    });
+  });
+</script>
