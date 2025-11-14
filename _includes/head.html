@@ -1,0 +1,11 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+
+<!-- CSS: 상대 URL 필터로 baseurl 안전 처리 -->
+<link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
+
+{%- seo -%}        <!-- jekyll-seo-tag 쓰는 경우 -->
+{%- feed_meta -%}  <!-- jekyll-feed 쓰는 경우 -->
+{%- include custom-head.html -%} <!-- 추가 head 조각 (빈 파일이어도 OK) -->
